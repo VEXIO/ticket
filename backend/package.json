@@ -1,0 +1,17 @@
+{
+  "name": "ticket",
+  "version": "1.0.0",
+  "description": "A light ticket system.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Haotian Liu",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.16.1",
+    "express": "^4.14.1",
+    "mysql": "^2.13.0",
+    "redis": "^2.6.5"
+  }
+}
