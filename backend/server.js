@@ -10,6 +10,7 @@ app.get('/', function (req, res) {
 })
 
 app.post('/ticket/:ticketId', require('./dist/ticket.js'))
+app.post('/check/:ticketId', require('./dist/checkStatus.js'))
 
 app.listen(3000, function () {
     console.log('Server started at port 3000.')

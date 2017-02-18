@@ -2,9 +2,10 @@ let ticket = require('./ticket.config.js')
 
 let _ticket = function (req, res) {
     let redis = require('redis').createClient()
-    let params = req.params
     let reqBody = req.body
     let requestSent = false
+
+    ticket.id = req.params.ticketId
 
     redis.on("error", function (err) {
         redis.quit()

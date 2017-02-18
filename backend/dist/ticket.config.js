@@ -1,15 +1,23 @@
 module.exports = {
     id: 0,
-    keyBase: 'ticket',
-    setBase: 'ticketSet',
-    listBase: 'ticketList',
+    _key: 'ticket',
+    _set: 'ticketSet',
+    _res: 'ticketResult',
+    _resl: 'ticketResList',
+    _list: 'ticketList',
     get key() {
-        return this.keyBase + this.id
+        return this._key + this.id
     },
     get set() {
-        return this.setBase + this.id
+        return this._set + this.id
+    },
+    get res() {
+        return this._res + this.id
+    },
+    get resl() {
+        return this._resl + this.id
     },
     get list() {
-        return this.listBase + this.id
+        return this._list + this.id
     }
 }
