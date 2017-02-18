@@ -4,7 +4,8 @@
   "description": "A light ticket system.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "process": "node process.js"
   },
   "author": "Haotian Liu",
   "license": "MIT",

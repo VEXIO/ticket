@@ -103,7 +103,7 @@ let _ticket = function (req, res) {
         let datetime = new Date()
         insertSuccess.cnt = 2
 
-        redis.lpush(ticket.list, JSON.stringify({
+        redis.rpush(ticket.list, JSON.stringify({
             name: reqBody.name,
             phone: reqBody.phone,
             timestamp: datetime
