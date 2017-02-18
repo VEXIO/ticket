@@ -1,18 +1,4 @@
-let ticket = {
-    id: 0,
-    keyBase: 'ticket',
-    setBase: 'ticketSet',
-    listBase: 'ticketList',
-    get key() {
-        return this.keyBase + this.id
-    },
-    get set() {
-        return this.setBase + this.id
-    },
-    get list() {
-        return this.listBase + this.id
-    }
-}
+let ticket = require('./ticket.config.js')
 
 let _ticket = function (req, res) {
     let redis = require('redis').createClient()
