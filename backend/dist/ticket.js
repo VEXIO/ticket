@@ -1,4 +1,5 @@
 let ticket = {
+    key: 'ticket',
     set: 'ticketSet',
     list: 'ticketList'
 }
@@ -8,6 +9,7 @@ let _ticket = function (req, res) {
     let params = req.params
     let reqBody = req.body
     let ticketId = params.ticketId
+    let ticketKey = ticket.key + ticketId
     let ticketSet = ticket.set + ticketId
     let ticketList = ticket.list + ticketId
     let requestSent = false
@@ -46,12 +48,41 @@ let _ticket = function (req, res) {
                 return true
             }
         })}
-        if (validation)
-            checkPhoneNumber()
+        if (validation) {
+            checkStatus()
+        }
     }
 
-    let checkPhoneNumber = () => {
-        let res = redis.sismember(ticketSet, reqBody.phone, function (err, reply) {
+    let checkStatus = () => {
+        let verifyStatus = () => {
+            verifyStatus.cnt--
+            if (verifyStatus.cnt == 0) {
+                insertRecord()
+            }
+        }
+
+        verifyStatus.cnt = 2
+
+        // Check whether ticket queue has been closed.
+        redis.get(ticketKey, (err, reply) => {
+            if (err !== null) {
+                callback(true, {
+                    err: 1,
+                    code: 100,
+                    msg: err
+                })
+            } else if (Boolean(reply)) {
+                callback(true, {
+                    err: 1,
+                    code: 102
+                })
+            } else {
+                verifyStatus()
+            }
+        })
+
+        // Check whether user has requested with same phone number.
+        redis.sismember(ticketSet, reqBody.phone, function (err, reply) {
             if (err !== null) {
                 callback(true, {
                     err: 1,
@@ -64,7 +95,7 @@ let _ticket = function (req, res) {
                     code: 101
                 })
             } else {
-                insertRecord()
+                verifyStatus()
             }
         })
     }
@@ -107,7 +138,11 @@ let _ticket = function (req, res) {
     }
 
     let callback = (err, reply) => {
-        requestSent = true
+        if (requestSent === true) {
+            return
+        } else {
+            requestSent = true
+        }
         if (err) {
             let msg
             if (typeof(reply) === 'object' && reply.hasOwnProperty('code')) {
@@ -122,6 +157,9 @@ let _ticket = function (req, res) {
                         break
                     case 101:
                         msg = 'Phone number already exists.'
+                        break
+                    case 102:
+                        msg = 'Tickets are exhausted.'
                         break
                 }
             } else {
