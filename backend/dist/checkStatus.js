@@ -5,8 +5,6 @@ let _check = (req, res) => {
     let reqBody = req.body
     let requestSent = false
 
-    ticket.id = req.params.ticketId
-
     redis.on("error", (err) => {
         redis.quit()
         if (requestSent == false){
