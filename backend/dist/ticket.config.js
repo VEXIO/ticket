@@ -1,6 +1,6 @@
 module.exports = {
     id: 10,
-    resLimit: 20,
+    resLimit: 10,
     _key: 'ticket',
     _set: 'ticketSet',
     _res: 'ticketResult',

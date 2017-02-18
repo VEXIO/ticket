@@ -35,32 +35,31 @@ let _process = () => {
     }
 
     let checkTicketStatus = () => {
-        if (reslen === null) {
-            redis.llen(ticket.resl, (err, reply) => {
-                if (err) {
-                    console.error(err)
+        redis.llen(ticket.resl, (err, reply) => {
+            if (err) {
+                console.error(err)
+            } else {
+                reslen = parseInt(reply)
+                if (reslen >= ticket.resLimit) {
+                    redis.set(ticket.key, "full")
                 } else {
-                    reslen = parseInt(reply)
+                    redis.lpop(ticket.list, (err, reply) => {
+                        if (err) {
+                            console.error(err)
+                        } else if (reply != null) {
+                            let obj = JSON.parse(reply)
+                            if (obj != null && typeof obj === 'object' && obj.hasOwnProperty('phone')) {
+                                redis.rpush(ticket.resl, reply)
+                                redis.sadd(ticket.res, obj.phone)
+                                reslen = null
+                            } else {
+                                console.error("Reply not an JSON string with phone number. [reply string] ", reply)
+                            }
+                        }
+                    })
                 }
-            })
-        } else if (reslen > ticket.resLimit) {
-            //
-        } else {
-            redis.lpop(ticket.list, (err, reply) => {
-                if (err) {
-                    console.error(err)
-                } else if (reply != null) {
-                    let obj = JSON.parse(reply)
-                    if (obj != null && typeof obj === 'object' && obj.hasOwnProperty('phone')) {
-                        redis.rpush(ticket.resl, reply)
-                        redis.sadd(ticket.res, obj.phone)
-                        reslen = null
-                    } else {
-                        console.error("Reply not an JSON string with phone number. [reply string] ", reply)
-                    }
-                }
-            })
-        }
+            }
+        })
     }
 
 
