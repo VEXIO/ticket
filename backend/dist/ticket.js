@@ -1,17 +1,23 @@
 let ticket = {
-    key: 'ticket',
-    set: 'ticketSet',
-    list: 'ticketList'
+    id: 0,
+    keyBase: 'ticket',
+    setBase: 'ticketSet',
+    listBase: 'ticketList',
+    get key() {
+        return this.keyBase + this.id
+    },
+    get set() {
+        return this.setBase + this.id
+    },
+    get list() {
+        return this.listBase + this.id
+    }
 }
 
 let _ticket = function (req, res) {
     let redis = require('redis').createClient()
     let params = req.params
     let reqBody = req.body
-    let ticketId = params.ticketId
-    let ticketKey = ticket.key + ticketId
-    let ticketSet = ticket.set + ticketId
-    let ticketList = ticket.list + ticketId
     let requestSent = false
 
     redis.on("error", function (err) {
@@ -64,7 +70,7 @@ let _ticket = function (req, res) {
         verifyStatus.cnt = 2
 
         // Check whether ticket queue has been closed.
-        redis.get(ticketKey, (err, reply) => {
+        redis.get(ticket.key, (err, reply) => {
             if (err !== null) {
                 callback(true, {
                     err: 1,
@@ -82,7 +88,7 @@ let _ticket = function (req, res) {
         })
 
         // Check whether user has requested with same phone number.
-        redis.sismember(ticketSet, reqBody.phone, function (err, reply) {
+        redis.sismember(ticket.set, reqBody.phone, function (err, reply) {
             if (err !== null) {
                 callback(true, {
                     err: 1,
@@ -109,7 +115,8 @@ let _ticket = function (req, res) {
         }
         let datetime = new Date()
         insertSuccess.cnt = 2
-        redis.lpush(ticketList, JSON.stringify({
+
+        redis.lpush(ticket.list, JSON.stringify({
             name: reqBody.name,
             phone: reqBody.phone,
             timestamp: datetime
@@ -124,7 +131,8 @@ let _ticket = function (req, res) {
                 insertSuccess()
             }
         })
-        redis.sadd(ticketSet, reqBody.phone, function (err, reply) {
+
+        redis.sadd(ticket.set, reqBody.phone, function (err, reply) {
             if (err) {
                 callback(true, {
                     err: 1,
@@ -178,7 +186,6 @@ let _ticket = function (req, res) {
             })
         }
     }
-
 }
 
 module.exports = _ticket
